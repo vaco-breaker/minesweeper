@@ -9,8 +9,6 @@
       <sub><b>홍유진🙋‍♀️</b></sub></a><br /></td>
       <td align="center"><a href="https://github.com/Seongnam-si" target="_blank">
       <sub><b>홍성남🙋‍♂️</b></sub></a><br /></td>
-      <td align="center"><a href="https://github.com/Frogman113" target="_blank">
-      <sub><b>김동현🙋‍♂️</b></sub></a><br /></td>
     </tr>
   </tbody>
 </table>
