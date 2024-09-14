@@ -4,12 +4,16 @@
   "description": "바닐라 자바스크립트로 구현하는 지뢰 찾기 ",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "husky install",
+    "format": "prettier --cache --write .",
+    "prepare": "husky"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "husky": "^9.1.6",
     "prettier": "^3.3.3"
   }
 }
