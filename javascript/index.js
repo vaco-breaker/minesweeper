@@ -1,42 +1,14 @@
+import Game from './game.js';
+
 const $mainTag = document.querySelector('main');
 const $flagNumber = document.querySelector('#flagNumber');
+const $startButton = document.querySelector('#startButton');
 const $resetButton = document.querySelector('#resetButton');
-const $timer = document.querySelector('#timer');
 const $gameBoard = document.querySelector('#gameBoard');
 
-class Game {
-  constructor() {
-    this.board = [
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    ];
-    this.timeLeft = 999;
-    this.timeId = null;
-  }
+const game = new Game(document);
+const clickStartCallback = () => {
+  game.start();
+};
 
-  start() {
-    this.createGameBoard();
-    this.timerStart();
-  }
-
-  timerStart() {
-    this.timeId = setInterval(() => {
-      timeLeft--;
-      $timer.textContent = `${timeLeft}`;
-      if (timeLeft === 0) {
-        alert('시간 초과!');
-        clearInterval(this.timeId);
-        this.timeLeft = 999;
-      }
-    }, 1000);
-  }
-
-  createGameBoard() {}
-}
+$startButton.addEventListener('click', clickStartCallback);
