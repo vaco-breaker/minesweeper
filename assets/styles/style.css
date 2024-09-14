@@ -5,6 +5,35 @@ body {
   align-items: center;
   gap: 20px;
   height: 100dvh;
-  background-color: indigo;
+  background-color: grey;
+  padding: 100px 0;
   font-family: 'Noto Sans KR', sans-serif;
+}
+
+header {
+  font-size: 60px;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+}
+
+div#gameInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 300px;
+}
+
+div#gameInfo div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid black;
+  width: 70px;
+  height: 40px;
 }
