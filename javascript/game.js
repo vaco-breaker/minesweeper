@@ -85,17 +85,17 @@ export default class Game {
 
   #createAroundMineArray(y, x) {
     const aroundMineArray = [
-      [x - 1, this.board.length - y - 1 - 1], 
+      [x - 1, this.board.length - y - 1 - 1],
       [x - 1, this.board.length - y - 1],
       [x - 1, this.board.length - y - 1 + 1],
       [x, this.board.length - y - 1 - 1],
-      [x, this.board.length - y - 1 + 1], 
-      [x + 1, this.board.length - y - 1 - 1], 
+      [x, this.board.length - y - 1 + 1],
+      [x + 1, this.board.length - y - 1 - 1],
       [x + 1, this.board.length - y - 1],
-      [x + 1, this.board.length - y - 1 + 1]
+      [x + 1, this.board.length - y - 1 + 1],
     ];
 
-    return aroundMineArray
+    return aroundMineArray;
   }
 
   clickLeftGameBoardCell = (e) => {
