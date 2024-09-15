@@ -8,13 +8,14 @@ export default class Game {
     this.svgCollection = SVG_COLLECTION;
     this.timeLeft = 999;
     this.timeId = null;
+    this.mineArray = [[2, 5]];
   }
 
   start() {
     this.#createGameBoard();
     this.#timerStart();
 
-    this.$gameBoard.addEventListener('click', this.clickLeftGameBoardCell);
+    this.$gameBoard.addEventListener('mouseup', this.clickLeftGameBoardCell);
     this.$gameBoard.addEventListener('contextmenu', this.clickRightGameBoardCell);
   }
 
@@ -41,6 +42,32 @@ export default class Game {
         this.$gameBoard.appendChild(newElement);
       });
     });
+
+    this.#createMine();
+  }
+
+  #createMine() {
+    while (this.mineArray.length < 10) {
+      const newMine = [Math.floor(Math.random() * 9), Math.floor(Math.random() * 9)];
+      let mineCheckFlag = false;
+
+      this.mineArray.forEach((mine) => {
+        if (mine[0] === newMine[0] && mine[1] === newMine[1]) mineCheckFlag = true;
+      });
+
+      if (mineCheckFlag === false) this.mineArray.push(newMine);
+    }
+
+    this.mineArray.forEach((value) => {
+      const [yIndex, xIndex] = value;
+      const $allCell = document.querySelectorAll('.cell');
+
+      Array.from($allCell).forEach((cell) => {
+        if (cell.dataset.index === `${[xIndex, this.board.length - yIndex - 1]}`) {
+          cell.innerHTML = this.svgCollection.mineImg;
+        }
+      });
+    });
   }
 
   clickLeftGameBoardCell = (e) => {
@@ -49,5 +76,7 @@ export default class Game {
 
   clickRightGameBoardCell = (e) => {
     e.preventDefault();
+
+    e.target.innerHtml = this.svgCollection.flagImg;
   };
 }
