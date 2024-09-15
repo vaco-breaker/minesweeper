@@ -1,24 +1,25 @@
+import { SVG_COLLECTION } from './svgCollection.js';
+import Player from './player.js';
+
 export default class Game {
-  constructor(document) {
-    this.board = [
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    ];
+  constructor() {
+    this.board = Array.from(Array(9), () => Array(9).fill(''));
     this.$timer = document.querySelector('#timer');
+    this.$gameBoard = document.querySelector('#gameBoard');
+    this.svgCollection = SVG_COLLECTION;
     this.timeLeft = 999;
     this.timeId = null;
+    this.mineArray = [];
+
+    this.player = new Player(this.board);
   }
 
   start() {
     this.#createGameBoard();
     this.#timerStart();
+
+    this.$gameBoard.addEventListener('click', this.player.clickLeftGameBoardCell);
+    this.$gameBoard.addEventListener('contextmenu', this.player.clickRightGameBoardCell);
   }
 
   #timerStart() {
@@ -26,7 +27,7 @@ export default class Game {
       this.timeLeft--;
       this.$timer.textContent = `${this.timeLeft}`;
 
-      if (timeLeft === 0) {
+      if (this.timeLeft === 0) {
         alert('시간 초과!');
         clearInterval(this.timeId);
         this.timeLeft = 999;
@@ -34,5 +35,75 @@ export default class Game {
     }, 1000);
   }
 
-  #createGameBoard() {}
+  #createGameBoard() {
+    this.board.forEach((row, yIndex) => {
+      row.forEach((cell, xIndex) => {
+        const newElement = document.createElement('div');
+        newElement.classList.add('cell');
+        newElement.dataset.index = `${[xIndex, this.board.length - yIndex - 1]}`;
+        newElement.textContent = '';
+        this.$gameBoard.appendChild(newElement);
+      });
+    });
+
+    this.#createMine();
+  }
+
+  #createMine() {
+    while (this.mineArray.length < 10) {
+      const newMine = [Math.floor(Math.random() * 9), Math.floor(Math.random() * 9)];
+      let mineCheckFlag = false;
+
+      this.mineArray.forEach((mine) => {
+        if (mine[0] === newMine[0] && mine[1] === newMine[1]) mineCheckFlag = true;
+      });
+
+      if (mineCheckFlag === false) {
+        this.mineArray.push(newMine);
+        this.board[newMine[0]][newMine[1]] = 'mine';
+      }
+    }
+
+    this.mineArray.forEach((value) => {
+      const [yIndex, xIndex] = value;
+      const $allCell = document.querySelectorAll('.cell');
+
+      Array.from($allCell).forEach((cell) => {
+        this.#countMineNumber(cell, yIndex, xIndex);
+      });
+    });
+  }
+
+  #countMineNumber(cell, yIndex, xIndex) {
+    const aroundMineArray = this.#createAroundMineArray(yIndex, xIndex);
+
+    for (let i = 0; i < aroundMineArray.length; i++) {
+      if (cell.dataset.index === `${aroundMineArray[i]}` && !cell.innerHTML.includes('svg')) {
+        if (
+          this.board[this.board.length - 1 - aroundMineArray[i][1]][aroundMineArray[i][0]] !==
+          'mine'
+        ) {
+          this.board[this.board.length - 1 - aroundMineArray[i][1]][aroundMineArray[i][0]] =
+            Number(
+              this.board[this.board.length - 1 - aroundMineArray[i][1]][aroundMineArray[i][0]],
+            ) + 1;
+        }
+      }
+    }
+  }
+
+  #createAroundMineArray(y, x) {
+    const aroundMineArray = [
+      [x - 1, this.board.length - y - 1 - 1],
+      [x - 1, this.board.length - y - 1],
+      [x - 1, this.board.length - y - 1 + 1],
+      [x, this.board.length - y - 1 - 1],
+      [x, this.board.length - y - 1 + 1],
+      [x + 1, this.board.length - y - 1 - 1],
+      [x + 1, this.board.length - y - 1],
+      [x + 1, this.board.length - y - 1 + 1],
+    ];
+
+    return aroundMineArray;
+  }
 }
