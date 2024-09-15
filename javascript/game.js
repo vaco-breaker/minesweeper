@@ -58,6 +58,7 @@ export default class Game {
       if (mineCheckFlag === false) this.mineArray.push(newMine);
     }
 
+    console.log(this.mineArray);
     this.mineArray.forEach((value) => {
       const [yIndex, xIndex] = value;
       const $allCell = document.querySelectorAll('.cell');
@@ -65,9 +66,36 @@ export default class Game {
       Array.from($allCell).forEach((cell) => {
         if (cell.dataset.index === `${[xIndex, this.board.length - yIndex - 1]}`) {
           cell.innerHTML = this.svgCollection.mineImg;
+        } else {
+          this.#countMineNumber(cell, yIndex, xIndex);
         }
       });
     });
+  }
+
+  #countMineNumber(cell, yIndex, xIndex) {
+    const aroundMineArray = this.#createAroundMineArray(yIndex, xIndex);
+
+    for (let i = 0; i < aroundMineArray.length; i++) {
+      if (cell.dataset.index === `${aroundMineArray[i]}`) {
+        cell.textContent = Number(cell.textContent) + 1;
+      }
+    }
+  }
+
+  #createAroundMineArray(y, x) {
+    const aroundMineArray = [
+      [x - 1, this.board.length - y - 1 - 1], 
+      [x - 1, this.board.length - y - 1],
+      [x - 1, this.board.length - y - 1 + 1],
+      [x, this.board.length - y - 1 - 1],
+      [x, this.board.length - y - 1 + 1], 
+      [x + 1, this.board.length - y - 1 - 1], 
+      [x + 1, this.board.length - y - 1],
+      [x + 1, this.board.length - y - 1 + 1]
+    ];
+
+    return aroundMineArray
   }
 
   clickLeftGameBoardCell = (e) => {
