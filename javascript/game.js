@@ -2,20 +2,20 @@ import { SVG_COLLECTION } from './svgCollection.js';
 
 export default class Game {
   constructor() {
-    this.board = Array(9).fill(Array(9).fill(0));
+    this.board = Array.from(Array(9), () => Array(9).fill(''));
     this.$timer = document.querySelector('#timer');
     this.$gameBoard = document.querySelector('#gameBoard');
     this.svgCollection = SVG_COLLECTION;
     this.timeLeft = 999;
     this.timeId = null;
-    this.mineArray = [[2, 5]];
+    this.mineArray = [];
   }
 
   start() {
     this.#createGameBoard();
     this.#timerStart();
 
-    this.$gameBoard.addEventListener('mouseup', this.clickLeftGameBoardCell);
+    this.$gameBoard.addEventListener('click', this.clickLeftGameBoardCell);
     this.$gameBoard.addEventListener('contextmenu', this.clickRightGameBoardCell);
   }
 
@@ -38,7 +38,7 @@ export default class Game {
         const newElement = document.createElement('div');
         newElement.classList.add('cell');
         newElement.dataset.index = `${[xIndex, this.board.length - yIndex - 1]}`;
-        newElement.textContent = 0;
+        newElement.textContent = '';
         this.$gameBoard.appendChild(newElement);
       });
     });
@@ -55,10 +55,12 @@ export default class Game {
         if (mine[0] === newMine[0] && mine[1] === newMine[1]) mineCheckFlag = true;
       });
 
-      if (mineCheckFlag === false) this.mineArray.push(newMine);
+      if (mineCheckFlag === false) {
+        this.mineArray.push(newMine);
+        this.board[newMine[0]][newMine[1]] = 'mine';
+      }
     }
 
-    console.log(this.mineArray);
     this.mineArray.forEach((value) => {
       const [yIndex, xIndex] = value;
       const $allCell = document.querySelectorAll('.cell');
@@ -81,6 +83,9 @@ export default class Game {
     for (let i = 0; i < aroundMineArray.length; i++) {
       if (cell.dataset.index === `${aroundMineArray[i]}` && !cell.innerHTML.includes('svg')) {
         cell.textContent = Number(cell.textContent) + 1;
+        this.board[this.board.length - 1 - aroundMineArray[i][1]][aroundMineArray[i][0]] =
+          Number(this.board[this.board.length - 1 - aroundMineArray[i][1]][aroundMineArray[i][0]]) +
+          1;
       }
     }
   }
@@ -107,6 +112,6 @@ export default class Game {
   clickRightGameBoardCell = (e) => {
     e.preventDefault();
 
-    e.target.innerHtml = this.svgCollection.flagImg;
+    e.target.innerHTML = this.svgCollection.flagImg;
   };
 }
