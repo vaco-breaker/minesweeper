@@ -66,9 +66,11 @@ export default class Game {
       Array.from($allCell).forEach((cell) => {
         if (cell.dataset.index === `${[xIndex, this.board.length - yIndex - 1]}`) {
           cell.innerHTML = this.svgCollection.mineImg;
-        } else {
-          this.#countMineNumber(cell, yIndex, xIndex);
         }
+      });
+
+      Array.from($allCell).forEach((cell) => {
+        this.#countMineNumber(cell, yIndex, xIndex);
       });
     });
   }
@@ -77,7 +79,7 @@ export default class Game {
     const aroundMineArray = this.#createAroundMineArray(yIndex, xIndex);
 
     for (let i = 0; i < aroundMineArray.length; i++) {
-      if (cell.dataset.index === `${aroundMineArray[i]}`) {
+      if (cell.dataset.index === `${aroundMineArray[i]}` && !cell.innerHTML.includes('svg')) {
         cell.textContent = Number(cell.textContent) + 1;
       }
     }
