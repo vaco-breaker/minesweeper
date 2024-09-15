@@ -1,8 +1,11 @@
+import { SVG_COLLECTION } from './svgCollection.js';
+
 export default class Game {
   constructor() {
     this.board = Array(9).fill(Array(9).fill(0));
     this.$timer = document.querySelector('#timer');
     this.$gameBoard = document.querySelector('#gameBoard');
+    this.svgCollection = SVG_COLLECTION;
     this.timeLeft = 999;
     this.timeId = null;
   }
@@ -11,7 +14,8 @@ export default class Game {
     this.#createGameBoard();
     this.#timerStart();
 
-    this.$gameBoard.addEventListener('click', this.clickGameBoardCell);
+    this.$gameBoard.addEventListener('click', this.clickLeftGameBoardCell);
+    this.$gameBoard.addEventListener('contextmenu', this.clickRightGameBoardCell);
   }
 
   #timerStart() {
@@ -39,7 +43,11 @@ export default class Game {
     });
   }
 
-  clickGameBoardCell = (e) => {
+  clickLeftGameBoardCell = (e) => {
     e.target.classList.add('flipped');
+  };
+
+  clickRightGameBoardCell = (e) => {
+    e.preventDefault();
   };
 }
