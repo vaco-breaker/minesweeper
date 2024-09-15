@@ -1,17 +1,8 @@
 export default class Game {
-  constructor(document) {
-    this.board = [
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    ];
+  constructor() {
+    this.board = Array(9).fill(Array(9).fill(0));
     this.$timer = document.querySelector('#timer');
+    this.$gameBoard = document.querySelector('#gameBoard');
     this.timeLeft = 999;
     this.timeId = null;
   }
@@ -19,6 +10,8 @@ export default class Game {
   start() {
     this.#createGameBoard();
     this.#timerStart();
+
+    this.$gameBoard.addEventListener('click', this.clickGameBoardCell);
   }
 
   #timerStart() {
@@ -26,7 +19,7 @@ export default class Game {
       this.timeLeft--;
       this.$timer.textContent = `${this.timeLeft}`;
 
-      if (timeLeft === 0) {
+      if (this.timeLeft === 0) {
         alert('시간 초과!');
         clearInterval(this.timeId);
         this.timeLeft = 999;
@@ -34,5 +27,19 @@ export default class Game {
     }, 1000);
   }
 
-  #createGameBoard() {}
+  #createGameBoard() {
+    this.board.forEach((row, yIndex) => {
+      row.forEach((cell, xIndex) => {
+        const newElement = document.createElement('div');
+        newElement.classList.add('cell');
+        newElement.dataset.index = `${[xIndex, this.board.length - yIndex - 1]}`;
+        newElement.textContent = 0;
+        this.$gameBoard.appendChild(newElement);
+      });
+    });
+  }
+
+  clickGameBoardCell = (e) => {
+    e.target.classList.add('flipped');
+  };
 }
