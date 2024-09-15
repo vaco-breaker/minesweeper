@@ -1,4 +1,5 @@
 import { SVG_COLLECTION } from './svgCollection.js';
+import Player from './player.js';
 
 export default class Game {
   constructor() {
@@ -9,14 +10,16 @@ export default class Game {
     this.timeLeft = 999;
     this.timeId = null;
     this.mineArray = [];
+
+    this.player = new Player(this.board);
   }
 
   start() {
     this.#createGameBoard();
     this.#timerStart();
 
-    this.$gameBoard.addEventListener('click', this.clickLeftGameBoardCell);
-    this.$gameBoard.addEventListener('contextmenu', this.clickRightGameBoardCell);
+    this.$gameBoard.addEventListener('click', this.player.clickLeftGameBoardCell);
+    this.$gameBoard.addEventListener('contextmenu', this.player.clickRightGameBoardCell);
   }
 
   #timerStart() {
@@ -66,12 +69,6 @@ export default class Game {
       const $allCell = document.querySelectorAll('.cell');
 
       Array.from($allCell).forEach((cell) => {
-        if (cell.dataset.index === `${[xIndex, this.board.length - yIndex - 1]}`) {
-          cell.innerHTML = this.svgCollection.mineImg;
-        }
-      });
-
-      Array.from($allCell).forEach((cell) => {
         this.#countMineNumber(cell, yIndex, xIndex);
       });
     });
@@ -82,10 +79,15 @@ export default class Game {
 
     for (let i = 0; i < aroundMineArray.length; i++) {
       if (cell.dataset.index === `${aroundMineArray[i]}` && !cell.innerHTML.includes('svg')) {
-        cell.textContent = Number(cell.textContent) + 1;
-        this.board[this.board.length - 1 - aroundMineArray[i][1]][aroundMineArray[i][0]] =
-          Number(this.board[this.board.length - 1 - aroundMineArray[i][1]][aroundMineArray[i][0]]) +
-          1;
+        if (
+          this.board[this.board.length - 1 - aroundMineArray[i][1]][aroundMineArray[i][0]] !==
+          'mine'
+        ) {
+          this.board[this.board.length - 1 - aroundMineArray[i][1]][aroundMineArray[i][0]] =
+            Number(
+              this.board[this.board.length - 1 - aroundMineArray[i][1]][aroundMineArray[i][0]],
+            ) + 1;
+        }
       }
     }
   }
@@ -104,14 +106,4 @@ export default class Game {
 
     return aroundMineArray;
   }
-
-  clickLeftGameBoardCell = (e) => {
-    e.target.classList.add('flipped');
-  };
-
-  clickRightGameBoardCell = (e) => {
-    e.preventDefault();
-
-    e.target.innerHTML = this.svgCollection.flagImg;
-  };
 }
