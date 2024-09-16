@@ -76,7 +76,7 @@ export default class Game {
 
   #countMineNumber(cell, yIndex, xIndex) {
     const aroundMineArray = this.#createAroundMineArray(yIndex, xIndex);
-
+    
     for (let i = 0; i < aroundMineArray.length; i++) {
       if (cell.dataset.index === `${aroundMineArray[i]}` && !cell.innerHTML.includes('svg')) {
         if (
