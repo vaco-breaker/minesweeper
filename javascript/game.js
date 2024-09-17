@@ -7,23 +7,47 @@ export default class Game {
     this.board = Array.from(Array(9), () => Array(9).fill(''));
     this.$timer = document.querySelector('#timer');
     this.$gameBoard = document.querySelector('#gameBoard');
+    this.$flagNumber = document.querySelector('#flagNumber');
     this.svgCollection = SVG_COLLECTION;
-    this.timeLeft = 999;
+    this.timeLeft = 100;
     this.timeId = null;
+    this.flagNumber = 10;
     this.mineArray = [];
     this.isGamePlaying = false;
 
-    this.player = new Player(this.board);
+    this.player = new Player(this.board, this.flagNumber);
   }
 
   start() {
     this.isGamePlaying = true;
+    this.$flagNumber.innerHTML = 10;
 
     this.#createGameBoard();
     this.#timerStart();
 
     this.$gameBoard.addEventListener('click', this.player.clickLeftGameBoardCell);
     this.$gameBoard.addEventListener('contextmenu', this.player.clickRightGameBoardCell);
+  }
+
+  reset() {
+    this.isGamePlaying = false;
+
+    clearInterval(this.timeId);
+    this.timeId = null;
+    this.timeLeft = 100;
+    this.$timer.textContent = `${this.timeLeft}`;
+    this.flagNumber = 10;
+
+    this.board = Array.from(Array(9), () => Array(9).fill(''));
+    this.mineArray = [];
+
+    this.$gameBoard.innerHTML = '';
+    this.$flagNumber.innerHTML = this.svgCollection.flagImg;
+
+    this.$gameBoard.removeEventListener('click', this.player.clickLeftGameBoardCell);
+    this.$gameBoard.removeEventListener('contextmenu', this.player.clickRightGameBoardCell);
+
+    this.player = new Player(this.board, this.flagNumber);
   }
 
   #timerStart() {
@@ -34,7 +58,7 @@ export default class Game {
       if (this.timeLeft === 0) {
         alert('시간 초과!');
         clearInterval(this.timeId);
-        this.timeLeft = 999;
+        this.timeLeft = 100;
       }
     }, 1000);
   }

@@ -3,7 +3,7 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 60px;
+  gap: 100px;
   height: 100dvh;
   background-color: floralwhite;
   padding: 50px 0;
@@ -19,18 +19,8 @@ main {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 20px;
+  gap: 40px;
   flex-grow: 1;
-}
-
-div#startButton {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: 1px solid black;
-  width: 70px;
-  height: 40px;
-  cursor: pointer;
 }
 
 div#gameInfo {
@@ -40,19 +30,45 @@ div#gameInfo {
   width: 300px;
 }
 
-div#gameInfo div {
+div#gameInfo > div:nth-child(odd) {
   display: flex;
   justify-content: center;
   align-items: center;
   border: 1px solid black;
-  width: 70px;
+  border-radius: 3px;
+  width: 50px;
   height: 40px;
 }
 
-div#gameBoardWrapper {
+.game-button-box {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  align-items: center;
+}
+
+.game-button {
   display: flex;
   justify-content: center;
   align-items: center;
+  border: 1px solid black;
+  border-radius: 3px;
+  width: 50px;
+  height: 40px;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.disabled {
+  background-color: darkgrey;
+}
+
+.game-board-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: start;
   flex-grow: 1;
 }
 

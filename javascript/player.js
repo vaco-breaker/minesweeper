@@ -2,9 +2,12 @@ import { SVG_COLLECTION } from './svgCollection.js';
 import { createCrossDirectionArray } from './utils.js';
 
 export default class Player {
-  constructor(board) {
+  constructor(board, flagNumber) {
     this.clickedBoard = Array.from(Array(9), () => Array(9).fill(null));
+    this.flagMap = Array.from(Array(9), () => Array(9).fill(null));
     this.board = board;
+    this.flagNumber = flagNumber;
+    this.flagStack = [];
     this.svgCollection = SVG_COLLECTION;
   }
 
@@ -45,13 +48,35 @@ export default class Player {
   clickRightGameBoardCell = (e) => {
     e.preventDefault();
 
-    e.target.innerHTML = this.svgCollection.flagImg;
+    console.dir(e.target, e.currentTarget);
+
+    if (this.flagNumber === 0) {
+      return;
+    }
+
+    if (Array.from(e.target.classList).includes('flipped')) {
+      return;
+    }
+
+    // if (e.target.innerHTML.includes('svg')) {
+    //   e.target.innerHTML = '';
+    //   this.flagNumber++;
+
+    //   const [yIndex, xIndex] = e.target.dataset.index.split(',').map(Number);
+    //   this.flagMap[yIndex][xIndex] = null;
+    // } else {
+    //   e.target.innerHTML = this.svgCollection.flagImg;
+    //   this.flagNumber--;
+
+    //   const [yIndex, xIndex] = e.target.dataset.index.split(',').map(Number);
+    //   this.flagMap[yIndex][xIndex] = 'flagged';
+    // }
   };
 
   #searchZero(yIndex, xIndex, numZeroChain) {
     if (yIndex < 0 || yIndex >= this.board.length) return;
     if (xIndex < 0 || xIndex >= this.board.length) return;
-    if (numZeroChain === 12) return;
+    if (numZeroChain === 13) return;
 
     numZeroChain++;
 
