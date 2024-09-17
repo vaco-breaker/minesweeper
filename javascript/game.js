@@ -1,5 +1,6 @@
-import { SVG_COLLECTION } from './svgCollection.js';
 import Player from './player.js';
+import { SVG_COLLECTION } from './svgCollection.js';
+import { createAroundArray } from './utils.js';
 
 export default class Game {
   constructor() {
@@ -10,11 +11,14 @@ export default class Game {
     this.timeLeft = 999;
     this.timeId = null;
     this.mineArray = [];
+    this.isGamePlaying = false;
 
     this.player = new Player(this.board);
   }
 
   start() {
+    this.isGamePlaying = true;
+
     this.#createGameBoard();
     this.#timerStart();
 
@@ -74,7 +78,7 @@ export default class Game {
   }
 
   #countMineNumber(cell, yIndex, xIndex) {
-    const aroundMineArray = this.#createAroundMineArray(yIndex, xIndex);
+    const aroundMineArray = createAroundArray(yIndex, xIndex, this.board.length);
 
     for (let i = 0; i < aroundMineArray.length; i++) {
       const oneOfAroundMine =
@@ -86,26 +90,5 @@ export default class Game {
         this.board[aroundMineArray[i][0]][aroundMineArray[i][1]] = oneOfAroundMine + 1;
       }
     }
-  }
-
-  #createAroundMineArray(y, x) {
-    const aroundMineArray = [
-      [y - 1, x - 1],
-      [y - 1, x],
-      [y - 1, x + 1],
-      [y, x - 1],
-      [y, x + 1],
-      [y + 1, x - 1],
-      [y + 1, x],
-      [y + 1, x + 1],
-    ];
-
-    return aroundMineArray.filter(
-      (coordinate) =>
-        0 <= coordinate[0] &&
-        coordinate[0] < this.board.length &&
-        0 <= coordinate[1] &&
-        coordinate[1] < this.board.length,
-    );
   }
 }

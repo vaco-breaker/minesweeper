@@ -5,6 +5,8 @@ const $startButton = document.querySelector('#startButton');
 
 const game = new Game();
 const handleStartButtonClick = () => {
+  if (game.isGamePlaying) return;
+
   game.start();
 };
 
