@@ -7,7 +7,7 @@ export default class Player {
     this.flagMap = Array.from(Array(9), () => Array(9).fill(null));
     this.board = board;
     this.flagNumber = flagNumber;
-    this.flagStack = [];
+    this.$flagNumber = document.querySelector('#flagNumber');
     this.svgCollection = SVG_COLLECTION;
   }
 
@@ -48,29 +48,48 @@ export default class Player {
   clickRightGameBoardCell = (e) => {
     e.preventDefault();
 
-    console.dir(e.target, e.currentTarget);
-
-    if (this.flagNumber === 0) {
-      return;
-    }
-
     if (Array.from(e.target.classList).includes('flipped')) {
       return;
     }
 
-    // if (e.target.innerHTML.includes('svg')) {
-    //   e.target.innerHTML = '';
-    //   this.flagNumber++;
+    if (
+      e.target.innerHTML.includes('svg') ||
+      e.target.nodeName === 'svg' ||
+      e.target.nodeName === 'path'
+    ) {
+      if (e.target.nodeName === 'path') {
+        const [yIndex, xIndex] = e.target.parentNode.parentNode.parentNode.dataset.index
+          .split(',')
+          .map(Number);
+        this.flagMap[yIndex][xIndex] = null;
 
-    //   const [yIndex, xIndex] = e.target.dataset.index.split(',').map(Number);
-    //   this.flagMap[yIndex][xIndex] = null;
-    // } else {
-    //   e.target.innerHTML = this.svgCollection.flagImg;
-    //   this.flagNumber--;
+        e.target.parentNode.parentNode.parentNode.innerHTML = '';
+      } else if (e.target.nodeName === 'svg') {
+        const [yIndex, xIndex] = e.target.parentNode.dataset.index.split(',').map(Number);
+        this.flagMap[yIndex][xIndex] = null;
 
-    //   const [yIndex, xIndex] = e.target.dataset.index.split(',').map(Number);
-    //   this.flagMap[yIndex][xIndex] = 'flagged';
-    // }
+        e.target.parentNode.innerHTML = '';
+      } else {
+        const [yIndex, xIndex] = e.target.dataset.index.split(',').map(Number);
+        this.flagMap[yIndex][xIndex] = null;
+
+        e.target.innerHTML = '';
+      }
+
+      this.flagNumber++;
+      this.$flagNumber.textContent = `${this.flagNumber}`;
+    } else {
+      if (this.flagNumber === 0) {
+        return;
+      }
+
+      const [yIndex, xIndex] = e.target.dataset.index.split(',').map(Number);
+      this.flagMap[yIndex][xIndex] = 'flagged';
+
+      e.target.innerHTML = this.svgCollection.flagImg;
+      this.flagNumber--;
+      this.$flagNumber.textContent = `${this.flagNumber}`;
+    }
   };
 
   #searchZero(yIndex, xIndex, numZeroChain) {
