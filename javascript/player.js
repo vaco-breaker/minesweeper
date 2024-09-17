@@ -10,13 +10,12 @@ export default class Player {
   clickLeftGameBoardCell = (e) => {
     e.target.classList.add('flipped');
 
-    const [xIndex, yIndex] = e.target.dataset.index.split(',');
-    const [xIndexForBoard, yIndexForBoard] = [this.board.length - yIndex - 1, Number(xIndex)];
+    const [yIndex, xIndex] = e.target.dataset.index.split(',').map(Number);
 
-    if (this.board[xIndexForBoard][yIndexForBoard] === 'mine') {
+    if (this.board[yIndex][xIndex] === 'mine') {
       e.target.innerHTML = this.svgCollection.mineImg;
-    } else if (this.board[xIndexForBoard][yIndexForBoard] !== '') {
-      e.target.innerHTML = this.board[xIndexForBoard][yIndexForBoard];
+    } else if (this.board[yIndex][xIndex] !== '') {
+      e.target.innerHTML = this.board[yIndex][xIndex];
     }
   };
 

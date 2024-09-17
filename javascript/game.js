@@ -40,8 +40,7 @@ export default class Game {
       row.forEach((cell, xIndex) => {
         const newElement = document.createElement('div');
         newElement.classList.add('cell');
-        newElement.dataset.index = `${[xIndex, this.board.length - yIndex - 1]}`;
-        newElement.textContent = '';
+        newElement.dataset.index = `${[yIndex, xIndex]}`;
         this.$gameBoard.appendChild(newElement);
       });
     });
@@ -78,32 +77,35 @@ export default class Game {
     const aroundMineArray = this.#createAroundMineArray(yIndex, xIndex);
 
     for (let i = 0; i < aroundMineArray.length; i++) {
-      if (cell.dataset.index === `${aroundMineArray[i]}` && !cell.innerHTML.includes('svg')) {
-        if (
-          this.board[this.board.length - 1 - aroundMineArray[i][1]][aroundMineArray[i][0]] !==
-          'mine'
-        ) {
-          this.board[this.board.length - 1 - aroundMineArray[i][1]][aroundMineArray[i][0]] =
-            Number(
-              this.board[this.board.length - 1 - aroundMineArray[i][1]][aroundMineArray[i][0]],
-            ) + 1;
-        }
+      const oneOfAroundMine =
+        this.board[aroundMineArray[i][0]][aroundMineArray[i][1]] === 'mine'
+          ? 'mine'
+          : Number(this.board[aroundMineArray[i][0]][aroundMineArray[i][1]]);
+
+      if (cell.dataset.index === `${aroundMineArray[i]}` && oneOfAroundMine !== 'mine') {
+        this.board[aroundMineArray[i][0]][aroundMineArray[i][1]] = oneOfAroundMine + 1;
       }
     }
   }
 
   #createAroundMineArray(y, x) {
     const aroundMineArray = [
-      [x - 1, this.board.length - y - 1 - 1],
-      [x - 1, this.board.length - y - 1],
-      [x - 1, this.board.length - y - 1 + 1],
-      [x, this.board.length - y - 1 - 1],
-      [x, this.board.length - y - 1 + 1],
-      [x + 1, this.board.length - y - 1 - 1],
-      [x + 1, this.board.length - y - 1],
-      [x + 1, this.board.length - y - 1 + 1],
+      [y - 1, x - 1],
+      [y - 1, x],
+      [y - 1, x + 1],
+      [y, x - 1],
+      [y, x + 1],
+      [y + 1, x - 1],
+      [y + 1, x],
+      [y + 1, x + 1],
     ];
 
-    return aroundMineArray;
+    return aroundMineArray.filter(
+      (coordinate) =>
+        0 <= coordinate[0] &&
+        coordinate[0] < this.board.length &&
+        0 <= coordinate[1] &&
+        coordinate[1] < this.board.length,
+    );
   }
 }
