@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="assets/styles/reset.css" />
     <link rel="stylesheet" href="assets/styles/style.css" />
+    <link rel="icon" href="assets/images/favicon.png" />
     <!-- Google Fonts - Noto Sans KR -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -18,13 +19,44 @@
   <body>
     <header>Minesweeper</header>
     <main>
-      <div id="startButton">게임 시작</div>
       <div id="gameInfo">
-        <div id="flagNumber">10</div>
-        <div id="resetButton">게임 리셋</div>
-        <div id="timer">999</div>
+        <div id="flagNumber">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            width="18px"
+            height="22px"
+            viewBox="0 0 18 21"
+            version="1.1"
+          >
+            <g id="surface1">
+              <path
+                style="
+                  stroke: none;
+                  fill-rule: nonzero;
+                  fill: rgb(95.294118%, 5.490196%, 5.490196%);
+                  fill-opacity: 1;
+                "
+                d="M 6.769531 0.175781 L 11.597656 0.175781 L 11.597656 10.480469 L 6.769531 10.480469 L 6.769531 8.546875 L 2.757812 8.546875 L 2.757812 6.433594 L 0.507812 6.433594 L 0.507812 4.222656 L 2.757812 4.222656 L 2.757812 2.109375 L 6.769531 2.109375 Z M 6.769531 0.175781 "
+              />
+              <path
+                style="stroke: none; fill-rule: nonzero; fill: rgb(0%, 0%, 0%); fill-opacity: 1"
+                d="M 8.859375 10.53125 L 11.597656 10.53125 L 11.597656 14.304688 L 13.796875 14.304688 L 13.796875 16.652344 L 17.808594 16.652344 L 17.808594 20.800781 L 0.128906 20.800781 L 0.128906 16.652344 L 4.683594 16.652344 L 4.683594 14.304688 L 8.859375 14.304688 Z M 8.859375 10.53125 "
+              />
+            </g>
+          </svg>
+        </div>
+        <div class="game-button-box">
+          <div class="game-button pointer" id="startButton">
+            <img src="./assets/images/play.png" alt="게임 시작 버튼" width="30px" />
+          </div>
+          <div class="game-button disabled" id="resetButton">
+            <img src="./assets/images/reset.png" alt="게임 리셋 버튼" width="30px" />
+          </div>
+        </div>
+        <div id="timer">100</div>
       </div>
-      <div id="gameBoardWrapper">
+      <div class="game-board-wrapper">
         <div id="gameBoard"></div>
       </div>
     </main>

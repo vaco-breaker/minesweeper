@@ -1,25 +1,54 @@
 import { SVG_COLLECTION } from './svgCollection.js';
-import Player from './player.js';
+import { createAroundArray, createTwoDimensionalArray } from './utils.js';
 
 export default class Game {
   constructor() {
-    this.board = Array.from(Array(9), () => Array(9).fill(''));
+    this.board = createTwoDimensionalArray(9, '');
     this.$timer = document.querySelector('#timer');
     this.$gameBoard = document.querySelector('#gameBoard');
+    this.$flagNumber = document.querySelector('#flagNumber');
     this.svgCollection = SVG_COLLECTION;
-    this.timeLeft = 999;
+    this.timeLeft = 100;
     this.timeId = null;
+    this.flagNumber = 10;
     this.mineArray = [];
+    this.isGamePlaying = false;
 
-    this.player = new Player(this.board);
+    this.player = null;
   }
 
-  start() {
+  start(player) {
+    this.isGamePlaying = true;
+    this.$flagNumber.innerHTML = 10;
+
+    this.player = player;
+
     this.#createGameBoard();
     this.#timerStart();
 
     this.$gameBoard.addEventListener('click', this.player.clickLeftGameBoardCell);
     this.$gameBoard.addEventListener('contextmenu', this.player.clickRightGameBoardCell);
+  }
+
+  reset() {
+    this.isGamePlaying = false;
+
+    this.$gameBoard.removeEventListener('click', this.player.clickLeftGameBoardCell);
+    this.$gameBoard.removeEventListener('contextmenu', this.player.clickRightGameBoardCell);
+
+    this.player = null;
+
+    clearInterval(this.timeId);
+    this.timeId = null;
+    this.timeLeft = 100;
+    this.$timer.textContent = `${this.timeLeft}`;
+    this.flagNumber = 10;
+
+    this.board = createTwoDimensionalArray(9, '');
+    this.mineArray = [];
+
+    this.$gameBoard.innerHTML = '';
+    this.$flagNumber.innerHTML = this.svgCollection.flagImg;
   }
 
   #timerStart() {
@@ -30,7 +59,7 @@ export default class Game {
       if (this.timeLeft === 0) {
         alert('시간 초과!');
         clearInterval(this.timeId);
-        this.timeLeft = 999;
+        this.timeLeft = 100;
       }
     }, 1000);
   }
@@ -40,8 +69,7 @@ export default class Game {
       row.forEach((cell, xIndex) => {
         const newElement = document.createElement('div');
         newElement.classList.add('cell');
-        newElement.dataset.index = `${[xIndex, this.board.length - yIndex - 1]}`;
-        newElement.textContent = '';
+        newElement.dataset.index = `${[yIndex, xIndex]}`;
         this.$gameBoard.appendChild(newElement);
       });
     });
@@ -75,35 +103,17 @@ export default class Game {
   }
 
   #countMineNumber(cell, yIndex, xIndex) {
-    const aroundMineArray = this.#createAroundMineArray(yIndex, xIndex);
+    const aroundMineArray = createAroundArray(yIndex, xIndex, this.board.length);
 
     for (let i = 0; i < aroundMineArray.length; i++) {
-      if (cell.dataset.index === `${aroundMineArray[i]}` && !cell.innerHTML.includes('svg')) {
-        if (
-          this.board[this.board.length - 1 - aroundMineArray[i][1]][aroundMineArray[i][0]] !==
-          'mine'
-        ) {
-          this.board[this.board.length - 1 - aroundMineArray[i][1]][aroundMineArray[i][0]] =
-            Number(
-              this.board[this.board.length - 1 - aroundMineArray[i][1]][aroundMineArray[i][0]],
-            ) + 1;
-        }
+      const oneOfAroundMine =
+        this.board[aroundMineArray[i][0]][aroundMineArray[i][1]] === 'mine'
+          ? 'mine'
+          : Number(this.board[aroundMineArray[i][0]][aroundMineArray[i][1]]);
+
+      if (cell.dataset.index === `${aroundMineArray[i]}` && oneOfAroundMine !== 'mine') {
+        this.board[aroundMineArray[i][0]][aroundMineArray[i][1]] = oneOfAroundMine + 1;
       }
     }
-  }
-
-  #createAroundMineArray(y, x) {
-    const aroundMineArray = [
-      [x - 1, this.board.length - y - 1 - 1],
-      [x - 1, this.board.length - y - 1],
-      [x - 1, this.board.length - y - 1 + 1],
-      [x, this.board.length - y - 1 - 1],
-      [x, this.board.length - y - 1 + 1],
-      [x + 1, this.board.length - y - 1 - 1],
-      [x + 1, this.board.length - y - 1],
-      [x + 1, this.board.length - y - 1 + 1],
-    ];
-
-    return aroundMineArray;
   }
 }
