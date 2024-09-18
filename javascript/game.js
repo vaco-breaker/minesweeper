@@ -1,10 +1,9 @@
-import Player from './player.js';
 import { SVG_COLLECTION } from './svgCollection.js';
-import { createAroundArray } from './utils.js';
+import { createAroundArray, createTwoDimensionalArray } from './utils.js';
 
 export default class Game {
   constructor() {
-    this.board = Array.from(Array(9), () => Array(9).fill(''));
+    this.board = createTwoDimensionalArray(9, '');
     this.$timer = document.querySelector('#timer');
     this.$gameBoard = document.querySelector('#gameBoard');
     this.$flagNumber = document.querySelector('#flagNumber');
@@ -15,12 +14,14 @@ export default class Game {
     this.mineArray = [];
     this.isGamePlaying = false;
 
-    this.player = new Player(this.board, this.flagNumber);
+    this.player = null;
   }
 
-  start() {
+  start(player) {
     this.isGamePlaying = true;
     this.$flagNumber.innerHTML = 10;
+
+    this.player = player;
 
     this.#createGameBoard();
     this.#timerStart();
@@ -32,22 +33,22 @@ export default class Game {
   reset() {
     this.isGamePlaying = false;
 
+    this.$gameBoard.removeEventListener('click', this.player.clickLeftGameBoardCell);
+    this.$gameBoard.removeEventListener('contextmenu', this.player.clickRightGameBoardCell);
+
+    this.player = null;
+
     clearInterval(this.timeId);
     this.timeId = null;
     this.timeLeft = 100;
     this.$timer.textContent = `${this.timeLeft}`;
     this.flagNumber = 10;
 
-    this.board = Array.from(Array(9), () => Array(9).fill(''));
+    this.board = createTwoDimensionalArray(9, '');
     this.mineArray = [];
 
     this.$gameBoard.innerHTML = '';
     this.$flagNumber.innerHTML = this.svgCollection.flagImg;
-
-    this.$gameBoard.removeEventListener('click', this.player.clickLeftGameBoardCell);
-    this.$gameBoard.removeEventListener('contextmenu', this.player.clickRightGameBoardCell);
-
-    this.player = new Player(this.board, this.flagNumber);
   }
 
   #timerStart() {

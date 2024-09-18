@@ -1,4 +1,5 @@
 import Game from './game.js';
+import Player from './player.js';
 
 const $startButton = document.querySelector('#startButton');
 const $resetButton = document.querySelector('#resetButton');
@@ -8,12 +9,14 @@ const game = new Game();
 const handleStartButtonClick = () => {
   if (game.isGamePlaying) return;
 
+  const player = new Player(game.board, game.flagNumber);
+
   $startButton.classList.remove('pointer');
   $startButton.classList.add('disabled');
   $resetButton.classList.add('pointer');
   $resetButton.classList.remove('disabled');
 
-  game.start();
+  game.start(player);
 };
 
 const handleResetButtonClick = () => {

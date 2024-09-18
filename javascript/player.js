@@ -1,10 +1,10 @@
 import { SVG_COLLECTION } from './svgCollection.js';
-import { createCrossDirectionArray } from './utils.js';
+import { createCrossDirectionArray, createTwoDimensionalArray, createIndexArray } from './utils.js';
 
 export default class Player {
   constructor(board, flagNumber) {
-    this.clickedBoard = Array.from(Array(9), () => Array(9).fill(null));
-    this.flagMap = Array.from(Array(9), () => Array(9).fill(null));
+    this.clickedBoard = createTwoDimensionalArray(9, null);
+    this.flagMap = createTwoDimensionalArray(9, null);
     this.board = board;
     this.flagNumber = flagNumber;
     this.$flagNumber = document.querySelector('#flagNumber');
@@ -12,11 +12,11 @@ export default class Player {
   }
 
   clickLeftGameBoardCell = (e) => {
-    if (e.target.innerHTML) return;
+    if (e.target.innerHTML || e.target.nodeName === 'path') return;
 
     e.target.classList.add('flipped');
 
-    const [yIndex, xIndex] = e.target.dataset.index.split(',').map(Number);
+    const [yIndex, xIndex] = createIndexArray(e.target);
 
     if (this.board[yIndex][xIndex] === 'mine') {
       e.target.innerHTML = this.svgCollection.mineImg;
@@ -26,11 +26,12 @@ export default class Player {
       this.clickedBoard[yIndex][xIndex] = this.board[yIndex][xIndex];
     } else {
       let numZeroChain = 0;
+
       this.#searchZero(yIndex, xIndex, numZeroChain);
 
       const $allCell = document.querySelectorAll('.cell');
       Array.from($allCell).forEach((cell) => {
-        const [yIndex, xIndex] = cell.dataset.index.split(',').map(Number);
+        const [yIndex, xIndex] = createIndexArray(cell);
 
         if (this.clickedBoard[yIndex][xIndex] === 'mine') {
           // 추후 지울 것, 어차피 mine 밟으면 게임 끝나있을테니
@@ -58,19 +59,17 @@ export default class Player {
       e.target.nodeName === 'path'
     ) {
       if (e.target.nodeName === 'path') {
-        const [yIndex, xIndex] = e.target.parentNode.parentNode.parentNode.dataset.index
-          .split(',')
-          .map(Number);
+        const [yIndex, xIndex] = createIndexArray(e.target.parentNode.parentNode.parentNode);
         this.flagMap[yIndex][xIndex] = null;
 
         e.target.parentNode.parentNode.parentNode.innerHTML = '';
       } else if (e.target.nodeName === 'svg') {
-        const [yIndex, xIndex] = e.target.parentNode.dataset.index.split(',').map(Number);
+        const [yIndex, xIndex] = createIndexArray(e.target.parentNode);
         this.flagMap[yIndex][xIndex] = null;
 
         e.target.parentNode.innerHTML = '';
       } else {
-        const [yIndex, xIndex] = e.target.dataset.index.split(',').map(Number);
+        const [yIndex, xIndex] = createIndexArray(e.target);
         this.flagMap[yIndex][xIndex] = null;
 
         e.target.innerHTML = '';
@@ -83,7 +82,7 @@ export default class Player {
         return;
       }
 
-      const [yIndex, xIndex] = e.target.dataset.index.split(',').map(Number);
+      const [yIndex, xIndex] = createIndexArray(e.target);
       this.flagMap[yIndex][xIndex] = 'flagged';
 
       e.target.innerHTML = this.svgCollection.flagImg;

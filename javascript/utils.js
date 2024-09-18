@@ -29,3 +29,11 @@ export const createCrossDirectionArray = (y, x) => {
 
   return aroundArray;
 };
+
+export const createTwoDimensionalArray = (length, value) => {
+  return Array.from(Array(length), () => Array(length).fill(value));
+};
+
+export const createIndexArray = (target) => {
+  return target.dataset.index.split(',').map(Number);
+};
