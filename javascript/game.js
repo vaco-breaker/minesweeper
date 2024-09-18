@@ -24,10 +24,10 @@ export default class Game {
     this.isGamePlaying = true;
     this.$flagNumber.innerHTML = 10;
 
-    this.player = player;
-
     this.#createGameBoard();
     this.#timerStart();
+
+    this.player = player;
 
     this.$loseModal = document.querySelector('#loseModalWrapper');
     this.$winModal = document.querySelector('#winModalWrapper');

@@ -52,6 +52,8 @@ export default class Player {
         }
       });
     }
+
+    this.#checkWin();
   };
 
   handleGameBoardCellRightClick = (e) => {
@@ -133,5 +135,43 @@ export default class Player {
     }
   }
 
-  #checkWin() {}
+  #checkWin() {
+    if (this.flagNumber > 0) return;
+
+    let nullNum = 0;
+    let flagOnSpotNum = 0;
+
+    this.clickedBoard.forEach((row, yIndex) => {
+      row.forEach((value, xIndex) => {
+        if (value === null) {
+          nullNum++;
+        }
+
+        if (
+          value === null &&
+          this.flagMap[yIndex][xIndex] === 'flagged' &&
+          this.board[yIndex][xIndex] === 'mine'
+        ) {
+          flagOnSpotNum++;
+        }
+      });
+    });
+
+    if (flagOnSpotNum === 10 && nullNum === 10) {
+      this.#win();
+    }
+  }
+
+  #win() {
+    this.$gameBoard.removeEventListener('click', this.handleGameBoardCellLeftClick);
+    this.$gameBoard.removeEventListener('contextmenu', this.handleGameBoardCellRightClick);
+    this.$winModal.classList.remove('invisible');
+
+    const $allCell = document.querySelectorAll('.cell');
+    Array.from($allCell).forEach((cell) => {
+      cell.classList.add('pointer-unset');
+    });
+
+    clearInterval(this.timerId.id);
+  }
 }
