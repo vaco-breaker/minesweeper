@@ -99,6 +99,8 @@ export default class Player {
       this.flagNumber--;
       this.$flagNumber.textContent = `${this.flagNumber}`;
     }
+
+    this.#checkWin();
   };
 
   handleClickLoseModal = () => {
