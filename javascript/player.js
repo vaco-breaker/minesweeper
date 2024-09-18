@@ -2,16 +2,22 @@ import { SVG_COLLECTION } from './svgCollection.js';
 import { createCrossDirectionArray, createTwoDimensionalArray, createIndexArray } from './utils.js';
 
 export default class Player {
-  constructor(board, flagNumber) {
+  constructor(board, flagNumber, loseFunc, timerId) {
     this.clickedBoard = createTwoDimensionalArray(9, null);
     this.flagMap = createTwoDimensionalArray(9, null);
+    this.$gameBoard = document.querySelector('#gameBoard');
+    this.$flagNumber = document.querySelector('#flagNumber');
+    this.$loseModal = document.querySelector('#loseModalWrapper');
+    this.$winModal = document.querySelector('#winModalWrapper');
+
+    this.svgCollection = SVG_COLLECTION;
     this.board = board;
     this.flagNumber = flagNumber;
-    this.$flagNumber = document.querySelector('#flagNumber');
-    this.svgCollection = SVG_COLLECTION;
+    this.loseFunc = loseFunc;
+    this.timerId = timerId;
   }
 
-  clickLeftGameBoardCell = (e) => {
+  handleGameBoardCellLeftClick = (e) => {
     if (e.target.innerHTML || e.target.nodeName === 'path') return;
 
     e.target.classList.add('flipped');
@@ -20,7 +26,9 @@ export default class Player {
 
     if (this.board[yIndex][xIndex] === 'mine') {
       e.target.innerHTML = this.svgCollection.mineImg;
-      this.clickedBoard[yIndex][xIndex] = 'mine';
+      e.target.classList.add('mine-backgroundColor');
+
+      this.loseFunc();
     } else if (this.board[yIndex][xIndex] !== '') {
       e.target.innerHTML = this.board[yIndex][xIndex];
       this.clickedBoard[yIndex][xIndex] = this.board[yIndex][xIndex];
@@ -46,7 +54,7 @@ export default class Player {
     }
   };
 
-  clickRightGameBoardCell = (e) => {
+  handleGameBoardCellRightClick = (e) => {
     e.preventDefault();
 
     if (Array.from(e.target.classList).includes('flipped')) {
@@ -91,6 +99,14 @@ export default class Player {
     }
   };
 
+  handleClickLoseModal = () => {
+    this.$loseModal.classList.add('invisible');
+  };
+
+  handleClickWinModal = () => {
+    this.$winModal.classList.add('invisible');
+  };
+
   #searchZero(yIndex, xIndex, numZeroChain) {
     if (yIndex < 0 || yIndex >= this.board.length) return;
     if (xIndex < 0 || xIndex >= this.board.length) return;
@@ -116,4 +132,6 @@ export default class Player {
       });
     }
   }
+
+  #checkWin() {}
 }
