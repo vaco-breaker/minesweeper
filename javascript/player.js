@@ -2,16 +2,22 @@ import { SVG_COLLECTION } from './svgCollection.js';
 import { createCrossDirectionArray, createTwoDimensionalArray, createIndexArray } from './utils.js';
 
 export default class Player {
-  constructor(board, flagNumber) {
+  constructor(board, flagNumber, loseFunc, timerId) {
     this.clickedBoard = createTwoDimensionalArray(9, null);
     this.flagMap = createTwoDimensionalArray(9, null);
+    this.$gameBoard = document.querySelector('#gameBoard');
+    this.$flagNumber = document.querySelector('#flagNumber');
+    this.$loseModal = document.querySelector('#loseModalWrapper');
+    this.$winModal = document.querySelector('#winModalWrapper');
+
+    this.svgCollection = SVG_COLLECTION;
     this.board = board;
     this.flagNumber = flagNumber;
-    this.$flagNumber = document.querySelector('#flagNumber');
-    this.svgCollection = SVG_COLLECTION;
+    this.loseFunc = loseFunc;
+    this.timerId = timerId;
   }
 
-  clickLeftGameBoardCell = (e) => {
+  handleGameBoardCellLeftClick = (e) => {
     if (e.target.innerHTML || e.target.nodeName === 'path') return;
 
     e.target.classList.add('flipped');
@@ -20,7 +26,9 @@ export default class Player {
 
     if (this.board[yIndex][xIndex] === 'mine') {
       e.target.innerHTML = this.svgCollection.mineImg;
-      this.clickedBoard[yIndex][xIndex] = 'mine';
+      e.target.classList.add('mine-backgroundColor');
+
+      this.loseFunc();
     } else if (this.board[yIndex][xIndex] !== '') {
       e.target.innerHTML = this.board[yIndex][xIndex];
       this.clickedBoard[yIndex][xIndex] = this.board[yIndex][xIndex];
@@ -44,9 +52,11 @@ export default class Player {
         }
       });
     }
+
+    this.#checkWin();
   };
 
-  clickRightGameBoardCell = (e) => {
+  handleGameBoardCellRightClick = (e) => {
     e.preventDefault();
 
     if (Array.from(e.target.classList).includes('flipped')) {
@@ -89,6 +99,16 @@ export default class Player {
       this.flagNumber--;
       this.$flagNumber.textContent = `${this.flagNumber}`;
     }
+
+    this.#checkWin();
+  };
+
+  handleClickLoseModal = () => {
+    this.$loseModal.classList.add('invisible');
+  };
+
+  handleClickWinModal = () => {
+    this.$winModal.classList.add('invisible');
   };
 
   #searchZero(yIndex, xIndex, numZeroChain) {
@@ -115,5 +135,45 @@ export default class Player {
         this.#searchZero(yIndex, xIndex, numZeroChain);
       });
     }
+  }
+
+  #checkWin() {
+    if (this.flagNumber > 0) return;
+
+    let nullNum = 0;
+    let flagOnSpotNum = 0;
+
+    this.clickedBoard.forEach((row, yIndex) => {
+      row.forEach((value, xIndex) => {
+        if (value === null) {
+          nullNum++;
+        }
+
+        if (
+          value === null &&
+          this.flagMap[yIndex][xIndex] === 'flagged' &&
+          this.board[yIndex][xIndex] === 'mine'
+        ) {
+          flagOnSpotNum++;
+        }
+      });
+    });
+
+    if (flagOnSpotNum === 10 && nullNum === 10) {
+      this.#win();
+    }
+  }
+
+  #win() {
+    this.$gameBoard.removeEventListener('click', this.handleGameBoardCellLeftClick);
+    this.$gameBoard.removeEventListener('contextmenu', this.handleGameBoardCellRightClick);
+    this.$winModal.classList.remove('invisible');
+
+    const $allCell = document.querySelectorAll('.cell');
+    Array.from($allCell).forEach((cell) => {
+      cell.classList.add('pointer-unset');
+    });
+
+    clearInterval(this.timerId.id);
   }
 }

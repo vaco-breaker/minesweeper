@@ -9,7 +9,7 @@ const game = new Game();
 const handleStartButtonClick = () => {
   if (game.isGamePlaying) return;
 
-  const player = new Player(game.board, game.flagNumber);
+  const player = new Player(game.board, game.flagNumber, game.lose, game.timerId);
 
   $startButton.classList.remove('pointer');
   $startButton.classList.add('disabled');

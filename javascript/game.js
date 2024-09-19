@@ -7,9 +7,12 @@ export default class Game {
     this.$timer = document.querySelector('#timer');
     this.$gameBoard = document.querySelector('#gameBoard');
     this.$flagNumber = document.querySelector('#flagNumber');
+    this.$loseModal = document.querySelector('#loseModalWrapper');
+    this.$winModal = document.querySelector('#winModalWrapper');
+
     this.svgCollection = SVG_COLLECTION;
     this.timeLeft = 100;
-    this.timeId = null;
+    this.timerId = { id: null };
     this.flagNumber = 10;
     this.mineArray = [];
     this.isGamePlaying = false;
@@ -21,25 +24,30 @@ export default class Game {
     this.isGamePlaying = true;
     this.$flagNumber.innerHTML = 10;
 
-    this.player = player;
-
     this.#createGameBoard();
     this.#timerStart();
 
-    this.$gameBoard.addEventListener('click', this.player.clickLeftGameBoardCell);
-    this.$gameBoard.addEventListener('contextmenu', this.player.clickRightGameBoardCell);
+    this.player = player;
+
+    this.$loseModal = document.querySelector('#loseModalWrapper');
+    this.$winModal = document.querySelector('#winModalWrapper');
+
+    this.$gameBoard.addEventListener('click', this.player.handleGameBoardCellLeftClick);
+    this.$gameBoard.addEventListener('contextmenu', this.player.handleGameBoardCellRightClick);
+    this.$loseModal.addEventListener('click', this.player.handleClickLoseModal, { once: true });
+    this.$winModal.addEventListener('click', this.player.handleClickWinModal, { once: true });
   }
 
   reset() {
     this.isGamePlaying = false;
 
-    this.$gameBoard.removeEventListener('click', this.player.clickLeftGameBoardCell);
-    this.$gameBoard.removeEventListener('contextmenu', this.player.clickRightGameBoardCell);
+    this.$gameBoard.removeEventListener('click', this.player.handleGameBoardCellLeftClick);
+    this.$gameBoard.removeEventListener('contextmenu', this.player.handleGameBoardCellRightClick);
 
     this.player = null;
 
-    clearInterval(this.timeId);
-    this.timeId = null;
+    clearInterval(this.timerId.id);
+    this.timerId = { id: null };
     this.timeLeft = 100;
     this.$timer.textContent = `${this.timeLeft}`;
     this.flagNumber = 10;
@@ -47,19 +55,25 @@ export default class Game {
     this.board = createTwoDimensionalArray(9, '');
     this.mineArray = [];
 
-    this.$gameBoard.innerHTML = '';
+    this.$gameBoard.innerHTML = `
+      <div id="loseModalWrapper" class="invisible modal lose-modal">
+        <img src="assets/images/gameOver.png" alt="게임 오버 이미지">
+      </div>
+      <div id="winModalWrapper" class="invisible modal win-modal">
+        <img src="assets/images/win.png" alt="게임 승리 이미지">
+      </div>
+    `;
+    this.$gameBoard.classList.remove('border');
     this.$flagNumber.innerHTML = this.svgCollection.flagImg;
   }
 
   #timerStart() {
-    this.timeId = setInterval(() => {
+    this.timerId.id = setInterval(() => {
       this.timeLeft--;
       this.$timer.textContent = `${this.timeLeft}`;
 
       if (this.timeLeft === 0) {
-        alert('시간 초과!');
-        clearInterval(this.timeId);
-        this.timeLeft = 100;
+        this.lose();
       }
     }, 1000);
   }
@@ -71,6 +85,7 @@ export default class Game {
         newElement.classList.add('cell');
         newElement.dataset.index = `${[yIndex, xIndex]}`;
         this.$gameBoard.appendChild(newElement);
+        this.$gameBoard.classList.add('border');
       });
     });
 
@@ -115,5 +130,27 @@ export default class Game {
         this.board[aroundMineArray[i][0]][aroundMineArray[i][1]] = oneOfAroundMine + 1;
       }
     }
+  }
+
+  lose() {
+    const handleGameBoardCellLeftClick =
+      this.constructor.name === 'Game'
+        ? this.player.handleGameBoardCellLeftClick
+        : this.handleGameBoardCellLeftClick;
+    const handleGameBoardCellRightClick =
+      this.constructor.name === 'Game'
+        ? this.player.handleGameBoardCellRightClick
+        : this.handleGameBoardCellRightClick;
+
+    this.$gameBoard.removeEventListener('click', handleGameBoardCellLeftClick);
+    this.$gameBoard.removeEventListener('contextmenu', handleGameBoardCellRightClick);
+    this.$loseModal.classList.remove('invisible');
+
+    const $allCell = document.querySelectorAll('.cell');
+    Array.from($allCell).forEach((cell) => {
+      cell.classList.add('pointer-unset');
+    });
+
+    clearInterval(this.timerId.id);
   }
 }
