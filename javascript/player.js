@@ -41,10 +41,7 @@ export default class Player {
       Array.from($allCell).forEach((cell) => {
         const [yIndex, xIndex] = createIndexArray(cell);
 
-        if (this.clickedBoard[yIndex][xIndex] === 'mine') {
-          // 추후 지울 것, 어차피 mine 밟으면 게임 끝나있을테니
-          cell.innerHTML = this.svgCollection.mineImg;
-        } else if (this.clickedBoard[yIndex][xIndex] === '') {
+        if (this.clickedBoard[yIndex][xIndex] === '') {
           cell.classList.add('flipped');
         } else if (this.clickedBoard[yIndex][xIndex] !== null) {
           cell.classList.add('flipped');
