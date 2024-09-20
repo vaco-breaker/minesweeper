@@ -33,9 +33,7 @@ export default class Player {
       e.target.innerHTML = this.board[yIndex][xIndex];
       this.clickedBoard[yIndex][xIndex] = this.board[yIndex][xIndex];
     } else {
-      let numZeroChain = 0;
-
-      this.#searchZero(yIndex, xIndex, numZeroChain);
+      this.#searchZero(yIndex, xIndex);
 
       const $allCell = document.querySelectorAll('.cell');
       Array.from($allCell).forEach((cell) => {
@@ -108,29 +106,41 @@ export default class Player {
     this.$winModal.classList.add('invisible');
   };
 
-  #searchZero(yIndex, xIndex, numZeroChain) {
-    if (yIndex < 0 || yIndex >= this.board.length) return;
-    if (xIndex < 0 || xIndex >= this.board.length) return;
-    if (numZeroChain === 13) return;
+  #searchZero(yIndex, xIndex) {
+    const BOARD_LENGTH = this.board.length;
+    const queue = [[yIndex, xIndex]];
+    const isHaveCheckedArray = createTwoDimensionalArray(9, false);
+    this.clickedBoard[yIndex][xIndex] = '';
 
-    numZeroChain++;
+    while (queue.length) {
+      const [y, x] = queue.shift();
 
-    if (this.board[yIndex][xIndex] === 'mine') {
-      return;
-    } else if (this.board[yIndex][xIndex] !== '') {
-      this.clickedBoard[yIndex][xIndex] = this.board[yIndex][xIndex];
+      const crossDirectionArray = createCrossDirectionArray(y, x);
 
-      return;
-    } else {
-      const crossDirectionArray = createCrossDirectionArray(yIndex, xIndex);
+      for (let i = 0; i < 4; i++) {
+        const ny = crossDirectionArray[i][0];
+        const nx = crossDirectionArray[i][1];
 
-      this.clickedBoard[yIndex][xIndex] = '';
+        if (ny < 0 || ny >= BOARD_LENGTH || nx < 0 || nx >= BOARD_LENGTH) {
+          continue;
+        } else if (isHaveCheckedArray[ny][nx]) {
+          continue;
+        }
 
-      crossDirectionArray.forEach((coordinate) => {
-        const [yIndex, xIndex] = coordinate;
+        isHaveCheckedArray[ny][nx] = true;
 
-        this.#searchZero(yIndex, xIndex, numZeroChain);
-      });
+        if (this.board[ny][nx] === 'mine') {
+          continue;
+        } else if (this.board[ny][nx] !== '') {
+          this.clickedBoard[ny][nx] = this.board[ny][nx];
+
+          continue;
+        }
+
+        this.clickedBoard[ny][nx] = '';
+
+        queue.push([ny, nx]);
+      }
     }
   }
 
